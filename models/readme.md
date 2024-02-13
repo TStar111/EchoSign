@@ -1,0 +1,1 @@
+This folder will store all the different models that we will have trained.
