@@ -5,6 +5,8 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, TensorDataset
 from torch.optim import Adam
 import torch.nn.functional as F
+import argparse
+
 
 
 def create_and_train_nn_classification(csv_file, model_save_path):
@@ -65,5 +67,27 @@ def create_and_train_nn_classification(csv_file, model_save_path):
     torch.save(model.state_dict(), model_save_path)
     print("Model has been saved successfully!")
 
+def main(data_file, model_file):
+    create_and_train_nn_classification(data_file, model_file)
+
+if __name__ == "__main__":
+    # Create ArgumentParser object
+    parser = argparse.ArgumentParser(description='Process two strings.')
+
+    # Add two string arguments
+    parser.add_argument('data_file', type=str, help='File path for data')
+    parser.add_argument('model_file', type=str, help='File path for where model will be uploaded')
+
+    # Parse the arguments
+    args = parser.parse_args()
+
+    # Access the parsed arguments
+    data_file = args.string1
+    model_file = args.string2
+
+    main(data_file, model_file)
+
+
 # TODO: Consider cross-validation
 # TODO: Consider wandb for additional insight while training and visualizing convergence.
+# TODO: Consider other achitectures beyond simple NN
