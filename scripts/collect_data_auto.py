@@ -25,6 +25,7 @@ def write_data(data):
 
 def main(connection_type, device_mac_address):
     global label
+    global filepath
     if connection_type == 'bluetooth':
         try:
             # Connect to the Arduino BLE device
@@ -33,6 +34,7 @@ def main(connection_type, device_mac_address):
 
             # Collect data for each label
             for letter in range(26):
+                filepath = f"../data/data_{chr(ord('A') + label)}.csv"
 
                 # Change the global label
                 label = letter
@@ -72,6 +74,7 @@ def main(connection_type, device_mac_address):
 
             # Collect data for each label
             for letter in range(26):
+                filepath = f"../data/data_{chr(ord('A') + label)}.csv"
 
                 # Change the global label
                 label = letter
