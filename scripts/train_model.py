@@ -6,10 +6,14 @@ from torch.utils.data import DataLoader, TensorDataset
 from torch.optim import Adam
 import torch.nn.functional as F
 import argparse
+import wandb
 
 
 
-def create_and_train_nn_classification(csv_file, model_save_path):
+def create_and_train_nn_classification(csv_file, model_save_path, wandb_project_name):
+    # Initialize wandb
+    wandb.init(project=wandb_project_name)
+
     # Step 1: Load your dataset
     data = pd.read_csv(csv_file)
 
@@ -61,7 +65,21 @@ def create_and_train_nn_classification(csv_file, model_save_path):
             loss = criterion(outputs, targets)
             loss.backward()
             optimizer.step()
-        print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {loss.item()}")
+            
+        # Log training loss to wandb
+        wandb.log({"Training Loss": loss.item(), "Epoch": epoch + 1})
+
+        # Testing
+        model.eval()
+        with torch.no_grad():
+            test_outputs = model(X_test_tensor)
+            test_loss = criterion(test_outputs, y_test_tensor)
+            _, predicted = torch.max(test_outputs, 1)
+            correct = (predicted == y_test_tensor).sum().item()
+            accuracy = correct / len(y_test_tensor)
+
+        # Log testing loss and accuracy to wandb
+        wandb.log({"Test Loss": test_loss.item(), "Test Accuracy": accuracy, "Epoch": epoch + 1})
 
     # Step 9: Save your trained model
     torch.save(model.state_dict(), model_save_path)
@@ -77,17 +95,18 @@ if __name__ == "__main__":
     # Add two string arguments
     parser.add_argument('data_file', type=str, help='File path for data')
     parser.add_argument('model_file', type=str, help='File path for where model will be uploaded')
+    parser.add_argument('wandb_project_name', type=str, help='Wandb project name')
 
     # Parse the arguments
     args = parser.parse_args()
 
     # Access the parsed arguments
-    data_file = args.string1
-    model_file = args.string2
+    data_file = args.data_file
+    model_file = args.model_file
+    wandb_project_name = args.wandb_project_name
 
-    main(data_file, model_file)
+    main(data_file, model_file, wandb_project_name)
 
 
 # TODO: Consider cross-validation
-# TODO: Consider wandb for additional insight while training and visualizing convergence.
 # TODO: Consider other achitectures beyond simple NN
