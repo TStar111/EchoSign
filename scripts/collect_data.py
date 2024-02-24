@@ -24,17 +24,30 @@ def write_data(data):
         writer.writerow([data, label])
 
 def main(connection_type, device_mac_address):
+    global label
     if connection_type == 'bluetooth':
         try:
             # Connect to the Arduino BLE device
             device = BLEDevice(device_mac_address)
             device.connect()
 
-            # Subscribe to the characteristic to receive data
-            device.subscribe("2A37", callback=handle_ble_data)
+            # Collect data for each label
+            for letter in range(26):
 
-            # Keep the program running
-            input("Press Enter to stop data collection and exit...")
+                # Change the global label
+                label = letter
+
+                # Prompt to start data collection
+                input(f"Collecting data for label '{chr(ord('A') + letter)}'. Press Enter to start...")
+
+                # Subscribe to the characteristic to receive data
+                device.subscribe("2A37", callback=handle_ble_data)
+
+                # Prompt to stop data collection
+                input(f"Press enter to stop...")
+
+                # Turn off subscription
+                device.unsubscribe("2A37")
 
         except exceptions.BLEError as e:
             print("BLE Error:", e)
@@ -57,9 +70,23 @@ def main(connection_type, device_mac_address):
             # Connect to Arduino via USB
             ser = serial.Serial('/dev/ttyUSB0', 9600)  # Adjust port and baud rate as needed
 
-            # Keep reading data
-            while True:
-                handle_usb_data(ser)
+            # Collect data for each label
+            for letter in range(26):
+
+                # Change the global label
+                label = letter
+
+                # Prompt to start data collection
+                input(f"Collecting data for label '{chr(ord('A') + letter)}'. Press Enter to start...")
+
+                # Start collecting data
+                try:
+                    while True:
+                        handle_usb_data(ser)
+                        time.sleep(0.01)  # Adjust as needed
+                except KeyboardInterrupt:
+                    print("Data collection stopped by user.")
+                    continue
 
         except serial.SerialException as e:
             print("Serial Error:", e)
