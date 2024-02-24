@@ -4,10 +4,10 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, TensorDataset
 from torch.optim import Adam
-import torch.nn.functional as F
 import argparse
 import wandb
 
+from models_NN import SimpleNN
 
 
 def create_and_train_nn_classification(csv_file, model_save_path, wandb_project_name):
@@ -33,18 +33,6 @@ def create_and_train_nn_classification(csv_file, model_save_path, wandb_project_
     # Step 4: Create DataLoader for your datasets
     train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
     train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
-
-    # Step 5: Define your neural network architecture
-    class SimpleNN(nn.Module):
-        def __init__(self, input_dim, hidden_dim, output_dim):
-            super(SimpleNN, self).__init__()
-            self.fc1 = nn.Linear(input_dim, hidden_dim)
-            self.fc2 = nn.Linear(hidden_dim, output_dim)
-
-        def forward(self, x):
-            x = F.relu(self.fc1(x))
-            x = self.fc2(x)
-            return x
 
     # Step 6: Instantiate your neural network
     input_dim = X_train.shape[1]
@@ -96,6 +84,7 @@ if __name__ == "__main__":
     parser.add_argument('data_file', type=str, help='File path for data')
     parser.add_argument('model_file', type=str, help='File path for where model will be uploaded')
     parser.add_argument('wandb_project_name', type=str, help='Wandb project name')
+    parser.add_argument('--learning_rate', type=float, default=0.001, help='Learning rate')
 
     # Parse the arguments
     args = parser.parse_args()
@@ -104,9 +93,9 @@ if __name__ == "__main__":
     data_file = args.data_file
     model_file = args.model_file
     wandb_project_name = args.wandb_project_name
+    learning_rate = args.learning_rate
 
     main(data_file, model_file, wandb_project_name)
 
 
-# TODO: Consider cross-validation
 # TODO: Consider other achitectures beyond simple NN
