@@ -2,6 +2,6 @@
 **/results/
 **.npy
 **.pkl
-**/scripts/
+# **/scripts/
 **/images/
 **.pickle
