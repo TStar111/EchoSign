@@ -15,15 +15,24 @@ def handle_ble_data(handle, value_bytes):
     write_data(received_data)
 
 def handle_usb_data(ser):
-    received_data = ser.readline().decode().strip()
-    write_data(received_data)
+    if ser.in_waiting > 0:  # Check if there's data available to read
+        received_data = ser.readline().decode().strip()
+        data_array = [float(x) for x in received_data.split(',')]  # Split and convert to int array
+        write_data(data_array)
 
 def write_data(data):
     with open(filepath, 'a', newline='') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow([data, label])
+        writer.writerow(data.append(label))
 
 def main(connection_type, device_mac_address):
+    header = ["Thumb1", "Index1", "Middle1", "Ring1", "Pinky1", "AccelX", "AccelY", "AccelZ",
+              "GyroX", "GyroY", "GyroZ", "MagX", "MagY", "MagZ", "Letter"]
+
+    with open(filepath, 'a', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(header)
+
     if connection_type == 'bluetooth':
         try:
             # Connect to the Arduino BLE device
