@@ -1,3 +1,9 @@
 torch
 torchvision
 pygatt
+joblib
+pandas
+sklearn
+wandb
+
+# TODO: Need to do some research into versioning
