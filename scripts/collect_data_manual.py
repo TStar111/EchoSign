@@ -7,8 +7,11 @@ import serial
 # File for data to be written to
 filepath = "../data/data.csv"
 
+# Alphabel dictionary
+my_dict = {chr(i): i - 97 for i in range(97, 107)}
+
 # Current label (manual)
-label = 0
+label = my_dict["a"]
 
 def handle_ble_data(handle, value_bytes):
     received_data = value_bytes.decode('utf-8')
