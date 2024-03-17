@@ -67,15 +67,16 @@ def main(connection_type, device_mac_address):
     elif connection_type == 'usb':
         try:
             # Connect to Arduino via USB
-            ser = serial.Serial('/dev/ttyUSB0', 9600)  # Adjust port and baud rate as needed
+            ser = serial.Serial('COM9', 9600, timeout=1)  # Adjust port and baud rate as needed
 
             # Keep reading data
             while True:
+                time.sleep(0.1)
                 handle_usb_data(ser)
 
         except serial.SerialException as e:
             print("Serial Error:", e)
-            ser.close()  # Close the serial connection before exiting
+            # ser.close()  # Close the serial connection before exiting
             print("Serial connection closed.")
             exit()
 

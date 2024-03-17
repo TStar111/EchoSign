@@ -7,7 +7,7 @@ from torch.optim import Adam
 import argparse
 import wandb
 
-from models_NN import SimpleNN
+from scripts.NN.models_NN import SimpleNN
 
 
 def create_and_train_nn_classification(csv_file, model_save_path, wandb_project_name):
@@ -84,7 +84,6 @@ if __name__ == "__main__":
     parser.add_argument('data_file', type=str, help='File path for data')
     parser.add_argument('model_file', type=str, help='File path for where model will be uploaded')
     parser.add_argument('wandb_project_name', type=str, help='Wandb project name')
-    parser.add_argument('--learning_rate', type=float, default=0.001, help='Learning rate')
 
     # Parse the arguments
     args = parser.parse_args()
