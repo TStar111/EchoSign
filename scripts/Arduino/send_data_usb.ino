@@ -9,7 +9,7 @@ void setup() {
     while (1);
   }
 
-  Serial.println("IMU initialized successfully!");
+  // Serial.println("IMU initialized successfully!");
 }
 
 void loop() {
@@ -26,15 +26,15 @@ void loop() {
     float magX, magY, magZ;
     IMU.readMagneticField(magX, magY, magZ);
     // Read analog pins
-    float analog1 = analogRead(A0);
-    float analog2 = analogRead(A1);
-    float analog3 = analogRead(A2);
-    float analog4 = analogRead(A3);
-    float analog5 = analogRead(A4);
+    float thumb = analogRead(A5);
+    float pointer = analogRead(A3);
+    float middle = analogRead(A7);
+    float ring = analogRead(A4);
+    float pinky = analogRead(A6);
     
     // Format should be Thumb, Index, Middle, Ring, Pinky, 
     // Format the data into a single string for CSV
-    String data = String(analog1) + "," + String(analog2) + "," + String(analog3) + "," + String(analog4) + "," + String(analog5) + ",";
+    String data = String(thumb) + "," + String(pointer) + "," + String(middle) + "," + String(ring) + "," + String(pinky) + ",";
     data += String(accelX) + "," + String(accelY) + "," + String(accelZ) + ",";
     data += String(gyroX) + "," + String(gyroY) + "," + String(gyroZ) + ",";
     data += String(magX) + "," + String(magY) + "," + String(magZ);
@@ -43,7 +43,7 @@ void loop() {
     Serial.println(data);
     
     // Delay for some time before reading again
-    delay(1000);
+    delay(5);
 
 }
 }
