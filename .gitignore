@@ -4,4 +4,6 @@
 **.pkl
 **/images/
 **.pickle
-**/data/**
+**/data/
+**/wandb/
+**/models/
