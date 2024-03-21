@@ -1,0 +1,5 @@
+1. Open the ARDUINO IDE
+2. Look at port
+3. Adjust port name in detect_sign.py script
+4. Pick out which model to use
+5. 

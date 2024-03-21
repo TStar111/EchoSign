@@ -45,7 +45,7 @@ def create_and_train_nn_classification(csv_file, model_save_path, wandb_project_
     optimizer = Adam(model.parameters(), lr=0.001)
 
     # Step 8: Train your neural network
-    num_epochs = 10
+    num_epochs = 30
     for epoch in range(num_epochs):
         for inputs, targets in train_loader:
             optimizer.zero_grad()
@@ -73,8 +73,8 @@ def create_and_train_nn_classification(csv_file, model_save_path, wandb_project_
     torch.save(model.state_dict(), model_save_path)
     print("Model has been saved successfully!")
 
-def main(data_file, model_file):
-    create_and_train_nn_classification(data_file, model_file)
+def main(data_file, model_file, wandb_project_name):
+    create_and_train_nn_classification(data_file, model_file, wandb_project_name)
 
 if __name__ == "__main__":
     # Create ArgumentParser object
@@ -84,7 +84,6 @@ if __name__ == "__main__":
     parser.add_argument('data_file', type=str, help='File path for data')
     parser.add_argument('model_file', type=str, help='File path for where model will be uploaded')
     parser.add_argument('wandb_project_name', type=str, help='Wandb project name')
-    parser.add_argument('--learning_rate', type=float, default=0.001, help='Learning rate')
 
     # Parse the arguments
     args = parser.parse_args()
@@ -93,9 +92,11 @@ if __name__ == "__main__":
     data_file = args.data_file
     model_file = args.model_file
     wandb_project_name = args.wandb_project_name
-    learning_rate = args.learning_rate
 
     main(data_file, model_file, wandb_project_name)
+
+# Command
+# python train_NN_model.py ../../data/dataset_single/dataset_single_none.csv ../../models/initial_none.pt echosign_single
 
 
 # TODO: Consider other achitectures beyond simple NN
