@@ -15,18 +15,36 @@ from utils import bytes_to_floats
 input_dim = 14
 hidden_dim = 64
 output_dim = 11
-
 checkpoint_path = '../models/simpleNN_none1.pt'
-
-# Alphabel dictionary
-dict_to_num = {chr(i): i - 97 for i in range(97, 107)}
-dict_to_let = {0:"a", 1:"b", 2:"c", 3:"d", 4:"e", 5:"f", 6:"g", 7:"h", 8:"i", 9:"k", 10:" "}
+consecutive = 8
 
 CHARACTERISTIC_UUID = "19B10001-E8F2-537E-4F6C-D104768A1214"
 address = "02:81:b7:4b:04:26" # MAC addres of the remove ble device
 
+# Alphabet dictionary
+dict_to_num = {chr(i): i - 97 for i in range(97, 107)}
+dict_to_let = {0:"a", 1:"b", 2:"c", 3:"d", 4:"e", 5:"f", 6:"g", 7:"h", 8:"i", 9:"k", 10:" "}
+
 #  TODO: Implement array/classification heuristic
 # TODO: Implement speakeer stuff
+
+class_tracker = [None, None]
+
+# Function that will return [bool, letter, new_tracker]
+def classification_heuristic(new_letter, tracker, consecutive):
+    curr_letter = tracker[0]
+    if new_letter == curr_letter:
+        tracker[1] += 1
+
+        if tracker[1] == consecutive:
+            tracker = [None, None]
+            return True, curr_letter, tracker
+        else:
+            return False, None, tracker
+    
+    else:
+        tracker = [new_letter, 1]
+        return False, None, tracker
 
 async def collect_bt(address, model):
     client = BleakClient(address)
@@ -50,7 +68,9 @@ async def collect_bt(address, model):
 
         yhat = dict_to_let[index]
 
-        print(yhat)
+        passed, letter, class_tracker = classification_heuristic(yhat, class_tracker, consecutive)
+        if passed:
+            print(yhat)
 
 def handle_usb_data(model, ser):
     if ser.in_waiting > 0:  # Check if there's data available to read
