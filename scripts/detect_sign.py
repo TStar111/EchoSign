@@ -28,6 +28,9 @@ engine = pyttsx3.init()
 dict_to_num = {chr(i): i - 97 for i in range(97, 107)}
 dict_to_let = {0:"a", 1:"b", 2:"c", 3:"d", 4:"e", 5:"f", 6:"g", 7:"h", 8:"i", 9:"k", 10:" "}
 
+# Empty storage
+start_time = None
+end_time = None
 class_tracker = [None, None]
 
 # Function that will return [bool, letter, new_tracker]
@@ -38,12 +41,14 @@ def classification_heuristic(new_letter, tracker, consecutive):
 
         if tracker[1] == consecutive:
             tracker = [None, None]
+            end_time = time.time()
             return True, curr_letter, tracker
         else:
             return False, None, tracker
     
     else:
         tracker = [new_letter, 1]
+        start_time = time.time()
         return False, None, tracker
 
 async def collect_bt(address, model):
@@ -71,6 +76,7 @@ async def collect_bt(address, model):
         passed, letter, class_tracker = classification_heuristic(yhat, class_tracker, consecutive)
         if passed:
             print(letter)
+            print("Elapsed time:", end_time - start_time)
             engine.say(letter)
             engine.runAndWait()
 
@@ -129,6 +135,7 @@ def main(connection_type, device_mac_address):
                 passed, letter, class_tracker = classification_heuristic(yhat, class_tracker, consecutive)
                 if passed:
                     print(letter)
+                    print("Elapsed time:", end_time - start_time)
                     engine.say(letter)
                     engine.runAndWait() 
 
