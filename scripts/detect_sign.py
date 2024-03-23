@@ -5,6 +5,7 @@ import serial
 import torch
 import asyncio
 import sys
+import pyttsx3
 from bleak import *
 
 from NN.models_NN import SimpleNN
@@ -21,12 +22,11 @@ consecutive = 8
 CHARACTERISTIC_UUID = "19B10001-E8F2-537E-4F6C-D104768A1214"
 address = "02:81:b7:4b:04:26" # MAC addres of the remove ble device
 
+engine = pyttsx3.init()
+
 # Alphabet dictionary
 dict_to_num = {chr(i): i - 97 for i in range(97, 107)}
 dict_to_let = {0:"a", 1:"b", 2:"c", 3:"d", 4:"e", 5:"f", 6:"g", 7:"h", 8:"i", 9:"k", 10:" "}
-
-#  TODO: Implement array/classification heuristic
-# TODO: Implement speakeer stuff
 
 class_tracker = [None, None]
 
@@ -70,7 +70,9 @@ async def collect_bt(address, model):
 
         passed, letter, class_tracker = classification_heuristic(yhat, class_tracker, consecutive)
         if passed:
-            print(yhat)
+            print(letter)
+            engine.say(letter)
+            engine.runAndWait()
 
 def handle_usb_data(model, ser):
     if ser.in_waiting > 0:  # Check if there's data available to read
@@ -123,8 +125,12 @@ def main(connection_type, device_mac_address):
             while True:
                 time.sleep(0.1)
                 yhat = handle_usb_data(model, ser)
-                if yhat is not None:
-                    print(yhat)
+                
+                passed, letter, class_tracker = classification_heuristic(yhat, class_tracker, consecutive)
+                if passed:
+                    print(letter)
+                    engine.say(letter)
+                    engine.runAndWait() 
 
         except serial.SerialException as e:
             print("Serial Error:", e)
