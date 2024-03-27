@@ -56,8 +56,8 @@ async def collect_bt(address1, address2):
 
     while True:
         time.sleep(0.2)
-        value1 = await client1.read_gatt_char(CHARACTERISTIC_UUID)
-        value2 = await client1.read_gatt_char(CHARACTERISTIC_UUID)
+        value1 = await client1.read_gatt_char(CHARACTERISTIC_UUID1)
+        value2 = await client1.read_gatt_char(CHARACTERISTIC_UUID2)
         received_data1 = bytes_to_floats(value1)
         received_data2 = bytes_to_floats(value2)
         received_data = received_data1 + received_data2
