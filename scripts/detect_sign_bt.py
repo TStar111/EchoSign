@@ -1,6 +1,6 @@
 import torch
 import time
-import pyttsx3
+from win32com.client import Dispatch
 
 from utils import bytes_to_floats, initialize_bt
 from NN.models_NN import SimpleNN
@@ -60,6 +60,9 @@ if __name__ == "__main__":
 
     # Set the model to evaluation mode
     model.eval()
+
+    # Initialize speaker (for Windows)
+    speak = Dispatch("SAPI.SpVoice").Speak
 
     try:
         # Keep reading data

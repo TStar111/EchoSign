@@ -1,6 +1,7 @@
 import time
 import serial
 import torch
+from win32com.client import Dispatch
 
 from NN.models_NN import SimpleNN
 
@@ -72,6 +73,9 @@ if __name__ == "__main__":
     # Set the model to evaluation mode
     model.eval()
 
+    # Initialize speaker (for Windows)
+    speak = Dispatch("SAPI.SpVoice").Speak
+
     try:
         # Connect to Arduino via USB
         ser = serial.Serial('COM9', 9600, timeout=1)  # Adjust port and baud rate as needed
@@ -87,6 +91,7 @@ if __name__ == "__main__":
                 if passed:
                     print(letter)
                     print("Elapsed time:", end_time - start_time)
+                    speak(letter)
 
     except serial.SerialException as e:
         print("Serial Error:", e)
