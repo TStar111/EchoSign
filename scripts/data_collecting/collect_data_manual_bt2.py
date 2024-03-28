@@ -56,3 +56,8 @@ if __name__ == "__main__":
         peripheral1.disconnect()
         peripheral2.disconnect()
         exit()
+
+# Run command below in scripts folder
+# python collect_data_manual_bt2.py
+        
+# Make sure to adjust label and output file before running
