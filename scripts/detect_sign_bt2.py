@@ -11,7 +11,7 @@ end_time = None
 class_tracker = [None, None]
 dict_to_let = {0:"a", 1:"b", 2:"c", 3:"d", 4:"e", 5:"f", 6:"g", 7:"h", 8:"i", 9:"k", 10:" "}
 
-# Model parameters
+# Model parameters TODO: Adjust for double
 input_dim = 14
 hidden_dim = 64
 output_dim = 11
@@ -20,7 +20,7 @@ checkpoint_path = '../models/simpleNN_none1.pt'
 # Hyperparameters
 consecutive = 8
 
-# ARDUINO Bluetooth information
+# ARDUINO Bluetooth information TODO: Add this, though not sure if needed
 CHARACTERISTIC_UUID = "19B10001-E8F2-537E-4F6C-D104768A1214"
 address = "02:81:b7:4b:04:26" # MAC addres of the remove ble device
 
@@ -45,7 +45,8 @@ def classification_heuristic(new_letter, tracker, consecutive):
         return False, None, tracker
 
 if __name__ == "__main__":
-    peripheral, service_uuid, characteristic_uuid = initialize_bt()
+    peripheral1, service_uuid1, characteristic_uuid1 = initialize_bt()
+    peripheral2, service_uuid2, characteristic_uuid2 = initialize_bt()
 
     # Initialize model with saved weights
     model = SimpleNN(input_dim, hidden_dim, output_dim)
@@ -66,9 +67,10 @@ if __name__ == "__main__":
         # Keep reading data
         while True:
             time.sleep(0.05)
-            contents = bytes_to_floats(peripheral.read(service_uuid, characteristic_uuid))
-            data_array = torch.tensor(contents)
-            print(contents)
+            contents1 = bytes_to_floats(peripheral1.read(service_uuid1, characteristic_uuid1))
+            contents2 = bytes_to_floats(peripheral2.read(service_uuid2, characteristic_uuid2))
+            content = contents1 + contents2
+            data_array = torch.tensor(content)
             probs = model(data_array)
             index = torch.argmax(probs, dim=0).item()
             yhat = dict_to_let[index]
@@ -80,9 +82,11 @@ if __name__ == "__main__":
                     print("Elapsed time:", end_time - start_time)
                     speak(letter)
 
+
     except KeyboardInterrupt:
         print("KeyboardInterrupt: Stopping inference...")
-        peripheral.disconnect()
+        peripheral1.disconnect()
+        peripheral2.disconnect()
         exit()
 
 # Run command below in scripts folder
