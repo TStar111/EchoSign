@@ -23,7 +23,7 @@ void setup() {
     while (1);
   }
 
-  BLE.setLocalName("CustomBLE");
+  BLE.setLocalName("RightHand");
   BLE.setAdvertisedService(customService);
 
   customService.addCharacteristic(customCharacteristic);
@@ -33,6 +33,11 @@ void setup() {
 
   BLE.advertise();
   Serial.println("BLE server is up and advertising!");
+
+  String address = BLE.address();
+
+  Serial.print("Local address is: ");
+  Serial.println(address);
 
 }
 
@@ -45,9 +50,9 @@ void loop() {
 
     while (central.connected()) {
 
-      double voltageThumb = analogRead(A5); // Read the analog input on pin A0
-      double voltagePoint = analogRead(A3); // Read the analog input on pin A0
-      double voltageMiddle = analogRead(A7); // Read the analog input on pin A0
+      double voltageThumb = analogRead(A7); // Read the analog input on pin A0
+      double voltagePoint = analogRead(A5); // Read the analog input on pin A0
+      double voltageMiddle = analogRead(A3); // Read the analog input on pin A0
       double voltageRing = analogRead(A4); // Read the analog input on pin A0
       double voltagePinky = analogRead(A6); // Read the analog input on pin A0
 
