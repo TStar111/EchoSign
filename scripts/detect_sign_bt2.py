@@ -5,6 +5,8 @@ from win32com.client import Dispatch
 from utils import bytes_to_floats, initialize_bt
 from NN.models_NN import SimpleNN
 
+from datetime import datetime
+
 # Empty storage (aka Global variables)
 start_time = None
 end_time = None
@@ -16,6 +18,15 @@ input_dim = 14
 hidden_dim = 64
 output_dim = 11
 checkpoint_path = '../models/simpleNN_none1.pt'
+
+flexFloor = 0
+flexCeil = 5
+
+minFlex1 = [float('inf')] * 5
+maxFlex1 = [-float('inf')] * 5
+
+minFlex2 = [float('inf')] * 5
+maxFlex2 = [-float('inf')] * 5
 
 # Hyperparameters
 consecutive = 8
@@ -44,6 +55,7 @@ def classification_heuristic(new_letter, tracker, consecutive):
         start_time = time.time()
         return False, None, tracker
 
+
 if __name__ == "__main__":
     peripheral1, service_uuid1, characteristic_uuid1 = initialize_bt()
     peripheral2, service_uuid2, characteristic_uuid2 = initialize_bt()
@@ -64,11 +76,34 @@ if __name__ == "__main__":
     speak = Dispatch("SAPI.SpVoice").Speak
 
     try:
+
+        # Haptic signal here to signal beginning of calibration
+        
+        # Calibrate data to map 
+        curTime = datetime.now()
+        while datetime.now() - curTime < 10: # 10 second period of calibration
+            time.sleep(0.05)
+            contents1 = bytes_to_floats(peripheral1.read(service_uuid1, characteristic_uuid1))
+            contents2 = bytes_to_floats(peripheral2.read(service_uuid2, characteristic_uuid2))
+            for i in range(5):
+                minFlex1[i] = min(minFlex1[i], contents1[i])
+                minFlex2[i] = min(minFlex2[i], contents2[i])
+                maxFlex1[i] = max(maxFlex1[i], contents1[i])
+                maxFlex2[i] = max(maxFlex2[i], contents2[i])
+
+
+        # Haptic signal here to signal end of calibration
+
         # Keep reading data
         while True:
             time.sleep(0.05)
             contents1 = bytes_to_floats(peripheral1.read(service_uuid1, characteristic_uuid1))
             contents2 = bytes_to_floats(peripheral2.read(service_uuid2, characteristic_uuid2))
+
+            for i in range(5):
+                contents1[i] = 5 * contents1[i]/(maxFlex1[i] - minFlex1[i])
+                contents2[i] = 5 * contents2[i]/(maxFlex2[i] - minFlex2[i])
+
             content = contents1 + contents2
             data_array = torch.tensor(content)
             probs = model(data_array)
