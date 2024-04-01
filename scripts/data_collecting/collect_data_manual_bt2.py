@@ -43,10 +43,26 @@ if __name__ == "__main__":
 
     try:
         # Keep reading data
+        curTime = time.now()
+        while time.now() - curTime < 10: # 10 second period of calibration
+            time.sleep(0.05)
+            contents1 = bytes_to_floats(peripheral1.read(service_uuid1, characteristic_uuid1))
+            contents2 = bytes_to_floats(peripheral2.read(service_uuid2, characteristic_uuid2))
+            for i in range(5):
+                minFlex1[i] = min(minFlex1[i], contents1[i])
+                minFlex2[i] = min(minFlex2[i], contents2[i])
+                maxFlex1[i] = max(maxFlex1[i], contents1[i])
+                maxFlex2[i] = max(maxFlex2[i], contents2[i])
+
         while True:
             time.sleep(0.05)
             contents1 = bytes_to_floats(peripheral1.read(service_uuid1, characteristic_uuid1))
             contents2 = bytes_to_floats(peripheral2.read(service_uuid2, characteristic_uuid2))
+            
+            for i in range(5):
+                contents1[i] = (contents1[i] - minFlex1[i])/(maxFlex1[i] - minFlex1[i])
+                contents2[i] = (contents2[i] - minFlex2[i])/(maxFlex2[i] - minFlex2[i])
+
             content = contents1 + contents2
             write_data(content)
 
