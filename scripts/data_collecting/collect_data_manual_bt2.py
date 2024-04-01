@@ -15,6 +15,12 @@ my_dict = {chr(i): i - 97 for i in range(97, 107)}
 label = my_dict["a"]
 label = 10
 
+# Calibration storage
+minFlex1 = [float('inf')] * 5
+maxFlex1 = [-float('inf')] * 5
+minFlex2 = [float('inf')] * 5
+maxFlex2 = [-float('inf')] * 5
+
 # Stuff for BT1
 CHARACTERISTIC_UUID1 = "19B10001-E8F2-537E-4F6C-D104768A1214"
 address1 = "02:81:b7:4b:04:26" # MAC addres of the remove ble device

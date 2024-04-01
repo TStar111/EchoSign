@@ -17,9 +17,9 @@ hidden_dim = 64
 output_dim = 11
 checkpoint_path = '../models/simpleNN_none1.pt'
 
+# Calibration storage
 minFlex1 = [float('inf')] * 5
 maxFlex1 = [-float('inf')] * 5
-
 minFlex2 = [float('inf')] * 5
 maxFlex2 = [-float('inf')] * 5
 
