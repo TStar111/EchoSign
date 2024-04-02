@@ -1,19 +1,18 @@
 import csv
 import time
 
-from ..utils import bytes_to_floats, initialize_bt
+from utils import bytes_to_floats, initialize_bt
 
 # Note for both implementations, the left should always be 1, and the right should always be 2
 
 # File for data to be written to
-filepath = "../../data/data.csv"
+filepath = "../../data/somya-b.csv"
 
 # Alphabel dictionary
-my_dict = {chr(i): i - 97 for i in range(97, 107)}
+my_dict = {chr(i): i - 97 for i in range(97, 123)}
 
 # Current label (manual)
-label = my_dict["a"]
-label = 10
+label = my_dict["b"]
 
 # Calibration storage
 minFlex1 = [float('inf')] * 5
@@ -49,8 +48,10 @@ if __name__ == "__main__":
 
     try:
         # Keep reading data
-        curTime = time.now()
-        while time.now() - curTime < 10: # 10 second period of calibration
+
+        print("Calibrating for 10 second, please move between max and min flexion")
+        curTime = time.time()
+        while time.time() - curTime < 10: # 10 second period of calibration
             time.sleep(0.05)
             contents1 = bytes_to_floats(peripheral1.read(service_uuid1, characteristic_uuid1))
             contents2 = bytes_to_floats(peripheral2.read(service_uuid2, characteristic_uuid2))
@@ -59,6 +60,11 @@ if __name__ == "__main__":
                 minFlex2[i] = min(minFlex2[i], contents2[i])
                 maxFlex1[i] = max(maxFlex1[i], contents1[i])
                 maxFlex2[i] = max(maxFlex2[i], contents2[i])
+        print(minFlex1)
+        print(maxFlex1)
+        print(minFlex2)
+        print(maxFlex2)
+        input("Press enter to start collecting data")
 
         while True:
             time.sleep(0.05)
