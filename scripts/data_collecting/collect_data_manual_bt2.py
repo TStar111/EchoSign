@@ -22,7 +22,7 @@ maxFlex2 = [-float('inf')] * 5
 
 # Stuff for BT1
 CHARACTERISTIC_UUID1 = "19B10001-E8F2-537E-4F6C-D104768A1214"
-address1 = "02:81:b7:4b:04:26" # MAC addres of the remove ble device
+address1 = "84:f5:9a:b9:e4:13" # MAC addres of the remove ble device
 # Stuff for BT2
 CHARACTERISTIC_UUID2 = "19B10001-E8F2-537E-4F6C-D104768A1214"
 address2 = "02:81:b7:4b:04:26" # MAC addres of the remove ble device
@@ -89,3 +89,11 @@ if __name__ == "__main__":
 # python collect_data_manual_bt2.py
         
 # Make sure to adjust label and output file before running
+
+# Steps
+# 1. Change the label and filepath before each run
+# 2. Plug in both arduinos
+# 3. Run the script
+# 4. Follow the bluetooth steps. Look for Left and right. ALways connect to the left one first!
+# 5. Service UUID is always the nonzero one
+# 6. Quickly check to see that the pinouts aare where you expect. Thumb, pointer, middle, ring, pinky
