@@ -7,7 +7,7 @@ from torch.optim import Adam
 import argparse
 import wandb
 
-from models_NN import SimpleNN
+from models_NN import SimpleNN, SimpleNN2
 
 
 def create_and_train_nn_classification(csv_file, model_save_path, wandb_project_name):
@@ -38,14 +38,14 @@ def create_and_train_nn_classification(csv_file, model_save_path, wandb_project_
     input_dim = X_train.shape[1]
     hidden_dim = 64
     output_dim = len(pd.unique(y))  # Number of unique classes in your target variable
-    model = SimpleNN(input_dim, hidden_dim, output_dim)
+    model = SimpleNN2(input_dim, hidden_dim, output_dim)
 
     # Step 7: Define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
     optimizer = Adam(model.parameters(), lr=0.001)
 
     # Step 8: Train your neural network
-    num_epochs = 30
+    num_epochs = 50
     for epoch in range(num_epochs):
         for inputs, targets in train_loader:
             optimizer.zero_grad()
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     main(data_file, model_file, wandb_project_name)
 
 # Command
-# python train_NN_model.py ../../data/dataset_single/dataset_single_none.csv ../../models/initial_none.pt echosign_single
+# python train_NN_model.py ../../data/dataset_double/dataset_double.csv ../../models/double_50_2.pt echosign_double
 
 
 # TODO: Consider other achitectures beyond simple NN

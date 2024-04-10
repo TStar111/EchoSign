@@ -40,3 +40,6 @@ if __name__ == "__main__":
 
     # Train SVM model and save it
     train_svm(args.data_file, args.model_path)
+
+# To run this:
+# python train_SVM_model.py ../data/dataset_double/dataset_double.csv ../models/double_SVM.pkl

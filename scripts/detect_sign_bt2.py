@@ -75,8 +75,8 @@ if __name__ == "__main__":
         # Haptic signal here to signal beginning of calibration
         
         # Calibrate data to map 
-        curTime = time.now()
-        while time.now() - curTime < 10: # 10 second period of calibration
+        curTime = time.time()
+        while time.time() - curTime < 10: # 10 second period of calibration
             time.sleep(0.05)
             contents1 = bytes_to_floats(peripheral1.read(service_uuid1, characteristic_uuid1))
             contents2 = bytes_to_floats(peripheral2.read(service_uuid2, characteristic_uuid2))
@@ -94,16 +94,21 @@ if __name__ == "__main__":
             time.sleep(0.05)
             contents1 = bytes_to_floats(peripheral1.read(service_uuid1, characteristic_uuid1))
             contents2 = bytes_to_floats(peripheral2.read(service_uuid2, characteristic_uuid2))
+            print("Left Hand:")
+            print(contents1)
+            print("Right Hand:")
+            print(contents2)
 
             for i in range(5):
                 contents1[i] = (contents1[i] - minFlex1[i])/(maxFlex1[i] - minFlex1[i])
                 contents2[i] = (contents2[i] - minFlex2[i])/(maxFlex2[i] - minFlex2[i])
 
-            content = contents1 + contents2
-            data_array = torch.tensor(content)
-            probs = model(data_array)
-            index = torch.argmax(probs, dim=0).item()
-            yhat = dict_to_let[index]
+            # content = contents1 + contents2
+            # data_array = torch.tensor(content)
+            # probs = model(data_array)
+            # index = torch.argmax(probs, dim=0).item()
+            # yhat = dict_to_let[index]
+            yhat = None
                         
             if yhat is not None:
                 passed, letter, class_tracker = classification_heuristic(yhat, class_tracker, consecutive)
