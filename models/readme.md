@@ -1,1 +1,1 @@
-This folder will store all the different models that we will have trained.
+This folder will store all the different models that we will have trained. The models will be stored locally. If you want access to some pre-trained models, feel free to reach out to me at rickyg@andrew.cmu.edu.

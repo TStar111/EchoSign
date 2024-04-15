@@ -9,13 +9,21 @@ from NN.models_NN import SimpleNN
 start_time = None
 end_time = None
 class_tracker = [None, None]
-dict_to_let = {0:"a", 1:"b", 2:"c", 3:"d", 4:"e", 5:"f", 6:"g", 7:"h", 8:"i", 9:"k", 10:" "}
+# Create an empty dictionary
+number_to_alphabet = {}
 
-# Model parameters TODO: Adjust for double
-input_dim = 14
+# Populate the dictionary
+for i in range(26):
+    number_to_alphabet[i] = chr(ord('a') + i)
+
+number_to_alphabet[26] = " "
+
+# Model parameters
+# Make sure to adjust this to reflect your choice of single/double, or model
+input_dim = 28
 hidden_dim = 64
-output_dim = 11
-checkpoint_path = '../models/simpleNN_none1.pt'
+output_dim = 27
+checkpoint_path = '../models/double_50_1.pt'
 
 # Calibration storage
 minFlex1 = [float('inf')] * 5
@@ -26,9 +34,11 @@ maxFlex2 = [-float('inf')] * 5
 # Hyperparameters
 consecutive = 8
 
-# ARDUINO Bluetooth information TODO: Add this, though not sure if needed
-CHARACTERISTIC_UUID = "19B10001-E8F2-537E-4F6C-D104768A1214"
-address = "02:81:b7:4b:04:26" # MAC addres of the remove ble device
+# ARDUINO Bluetooth information
+CHARACTERISTIC_UUID1 = "19B10001-E8F2-537E-4F6C-D104768A1214"
+address1 = "02:81:b7:4b:04:26" # MAC addres of the remove ble device
+CHARACTERISTIC_UUID2 = "19b10000-e8f2-537e-4f6c-d104768a1214"
+address2= "84:f5:9a:b9:e4:13"
 
 # Function that will return [bool, letter, new_tracker]
 def classification_heuristic(new_letter, tracker, consecutive):
@@ -52,8 +62,8 @@ def classification_heuristic(new_letter, tracker, consecutive):
 
 
 if __name__ == "__main__":
-    peripheral1, service_uuid1, characteristic_uuid1 = initialize_bt()
-    peripheral2, service_uuid2, characteristic_uuid2 = initialize_bt()
+    peripheral1, service_uuid1, characteristic_uuid1 = initialize_bt(mac=address2, uuid=CHARACTERISTIC_UUID2)
+    peripheral2, service_uuid2, characteristic_uuid2 = initialize_bt(mac=address1, uuid=CHARACTERISTIC_UUID1)
 
     # Initialize model with saved weights
     model = SimpleNN(input_dim, hidden_dim, output_dim)
@@ -75,8 +85,10 @@ if __name__ == "__main__":
         # Haptic signal here to signal beginning of calibration
         
         # Calibrate data to map 
+
+        print("Calibrating for 5 second, please move between max and min flexion")
         curTime = time.time()
-        while time.time() - curTime < 10: # 10 second period of calibration
+        while time.time() - curTime < 5: # 10 second period of calibration
             time.sleep(0.05)
             contents1 = bytes_to_floats(peripheral1.read(service_uuid1, characteristic_uuid1))
             contents2 = bytes_to_floats(peripheral2.read(service_uuid2, characteristic_uuid2))
@@ -86,6 +98,12 @@ if __name__ == "__main__":
                 maxFlex1[i] = max(maxFlex1[i], contents1[i])
                 maxFlex2[i] = max(maxFlex2[i], contents2[i])
 
+        print(minFlex1)
+        print(maxFlex1)
+        print(minFlex2)
+        print(maxFlex2)
+        input("Press enter to start inference")
+
 
         # Haptic signal here to signal end of calibration
 
@@ -94,23 +112,23 @@ if __name__ == "__main__":
             time.sleep(0.05)
             contents1 = bytes_to_floats(peripheral1.read(service_uuid1, characteristic_uuid1))
             contents2 = bytes_to_floats(peripheral2.read(service_uuid2, characteristic_uuid2))
-            print("Left Hand:")
-            print(contents1)
-            print("Right Hand:")
-            print(contents2)
+            # print("Left Hand:")
+            # print(contents1)
+            # print("Right Hand:")
+            # print(contents2)
 
             for i in range(5):
                 contents1[i] = (contents1[i] - minFlex1[i])/(maxFlex1[i] - minFlex1[i])
                 contents2[i] = (contents2[i] - minFlex2[i])/(maxFlex2[i] - minFlex2[i])
 
-            # content = contents1 + contents2
-            # data_array = torch.tensor(content)
-            # probs = model(data_array)
-            # index = torch.argmax(probs, dim=0).item()
-            # yhat = dict_to_let[index]
-            yhat = None
+            content = contents1 + contents2
+            data_array = torch.tensor(content)
+            probs = model(data_array)
+            index = torch.argmax(probs, dim=0).item()
+            yhat = number_to_alphabet[index]
                         
             if yhat is not None:
+                print(yhat)
                 passed, letter, class_tracker = classification_heuristic(yhat, class_tracker, consecutive)
                 if passed:
                     print(letter)
@@ -125,7 +143,7 @@ if __name__ == "__main__":
         exit()
 
 # Run command below in scripts folder
-# python detect_sign_bt.py
+# python detect_sign_bt2.py
         
 # Make sure to select the proper ML model before starting
         

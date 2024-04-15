@@ -13,7 +13,7 @@ def bytes_to_floats(byte_data):
     floats_list = list(floats)  # Convert tuple to list
     return floats_list
 
-def initialize_bt():
+def initialize_bt(mac=None, uuid = None):
     adapters = simplepyble.Adapter.get_adapters()
 
     if len(adapters) == 0:
@@ -24,7 +24,8 @@ def initialize_bt():
     for i, adapter in enumerate(adapters):
         print(f"{i}: {adapter.identifier()} [{adapter.address()}]")
 
-    choice = int(input("Enter choice: "))
+    # choice = int(input("Enter choice: "))
+    choice = 0
     adapter = adapters[choice]
 
     print(f"Selected adapter: {adapter.identifier()} [{adapter.address()}]")
@@ -38,12 +39,19 @@ def initialize_bt():
     peripherals = adapter.scan_get_results()
 
     # Query the user to pick a peripheral
-    print("Please select a peripheral:")
-    for i, peripheral in enumerate(peripherals):
-        print(f"{i}: {peripheral.identifier()} [{peripheral.address()}]")
+    if mac is None:
+        print("Please select a peripheral:")
+        for i, peripheral in enumerate(peripherals):
+            print(f"{i}: {peripheral.identifier()} [{peripheral.address()}]")
 
-    choice = int(input("Enter choice: "))
-    peripheral = peripherals[choice]
+        choice = int(input("Enter choice: "))
+        peripheral = peripherals[choice]
+    else:
+        for i, peripheral in enumerate(peripherals):
+            if peripheral.address() == mac:
+                choice = i
+                peripheral = peripherals[choice]
+                break
 
     print(f"Connecting to: {peripheral.identifier()} [{peripheral.address()}]")
     peripheral.connect()
@@ -56,11 +64,17 @@ def initialize_bt():
             service_characteristic_pair.append((service.uuid(), characteristic.uuid()))
 
     # Query the user to pick a service/characteristic pair
-    print("Please select a service/characteristic pair:")
-    for i, (service_uuid, characteristic) in enumerate(service_characteristic_pair):
-        print(f"{i}: {service_uuid} {characteristic}")
+    if uuid is None:
+        print("Please select a service/characteristic pair:")
+        for i, (service_uuid, characteristic) in enumerate(service_characteristic_pair):
+            print(f"{i}: {service_uuid} {characteristic}")
+        choice = int(input("Enter choice: "))
+    else:
+        for i, (service_uuid, characteristic) in enumerate(service_characteristic_pair):
+            if service_uuid == uuid:
+                choice = i
+                break
 
-    choice = int(input("Enter choice: "))
     service_uuid, characteristic_uuid = service_characteristic_pair[choice]
 
     return peripheral, service_uuid, characteristic_uuid
