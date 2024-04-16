@@ -83,7 +83,13 @@ if __name__ == "__main__":
     try:
 
         # Haptic signal here to signal beginning of calibration
-        
+        # Example condition to trigger the motor
+        start_calibrating = True  # Replace with your actual condition
+
+        if start_calibrating:
+            print("(BT to Arduino) Sending calibration start signal...")
+            ser.write(b'1')  # Send signal to Arduino to trigger motor
+            time.sleep(1)  # Delay to ensure the motor is activated
         # Calibrate data to map 
 
         print("Calibrating for 5 second, please move between max and min flexion")
@@ -106,6 +112,13 @@ if __name__ == "__main__":
 
 
         # Haptic signal here to signal end of calibration
+        # Example condition to trigger the motor
+        end_calibrating = True  # Replace with your actual condition
+
+        if end_calibrating:
+            print("(BT to Arduino) Sending calibration end signal...")
+            ser.write(b'1')  # Send signal to Arduino to trigger motor
+            time.sleep(1)  # Delay to ensure the motor is activated
 
         # Keep reading data
         while True:
