@@ -52,12 +52,17 @@ void loop() {
 
     while (central.connected()) {
       char incomingByte = central.read();
-      if (incomingByte == '1') { // Sign detected and speaker outputted something 
+      if (incomingByte == '1') { // Calibration signal from BT to Arduino 
       // Activate the haptic motor (pulse, vibrate, etc.)
-      digitalWrite(motorPin, HIGH);
-      delay(1000); // Pulse duration (1 second)
-      digitalWrite(motorPin, LOW);
-    }
+        digitalWrite(motorPin, HIGH);
+        delay(1000); // Pulse duration (1 second)
+        digitalWrite(motorPin, LOW);
+      }
+      if (incomingByte == '2') { // "Sign detected" signal from BT to Arduino 
+        digitalWrite(motorPin, HIGH);
+        delay(500); // Pulse duration (1 second)
+        digitalWrite(motorPin, LOW);
+      }
       double voltageThumb = analogRead(A3); // Read the analog input on pin A0
       double voltagePoint = analogRead(A5); // Read the analog input on pin A0
       double voltageMiddle = analogRead(A7); // Read the analog input on pin A0

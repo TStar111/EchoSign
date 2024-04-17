@@ -85,10 +85,10 @@ if __name__ == "__main__":
         # Haptic signal here to signal beginning of calibration
         # Example condition to trigger the motor
         start_calibrating = True  # Replace with your actual condition
-
+        
         if start_calibrating:
             print("(BT to Arduino) Sending calibration start signal...")
-            ser.write(b'1')  # Send signal to Arduino to trigger motor
+            peripheral1.write(service_uuid, characteristic_uuid, bytearray([1]))  # Send signal to glove 1 Arduino to trigger motors
             time.sleep(1)  # Delay to ensure the motor is activated
         # Calibrate data to map 
 
@@ -117,7 +117,7 @@ if __name__ == "__main__":
 
         if end_calibrating:
             print("(BT to Arduino) Sending calibration end signal...")
-            ser.write(b'1')  # Send signal to Arduino to trigger motor
+            peripheral1.write(service_uuid, characteristic_uuid, bytearray([1]))  # Send signal to Arduino to trigger motor
             time.sleep(1)  # Delay to ensure the motor is activated
 
         # Keep reading data
@@ -146,7 +146,14 @@ if __name__ == "__main__":
                 if passed:
                     print(letter)
                     print("Elapsed time:", end_time - start_time)
-                    speak(letter)
+                    speak(letter) # something has been successfully said 
+                    sign_detected = True 
+                    if sign_detected: 
+                        print("(BT to Arduino) Sending sign detected signal...") # TODO: confirm peripheral1 is right hand 
+                        peripheral1.write(service_uuid, characteristic_uuid, bytearray([2])) # Send signal to Arduino to trigger motor
+                        time.sleep(1) # Delay to ensure the motor is activated
+
+
 
 
     except KeyboardInterrupt:
