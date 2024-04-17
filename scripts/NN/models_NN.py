@@ -8,7 +8,7 @@ class SimpleNN(nn.Module):
         self.fc2 = nn.Linear(hidden_dim, output_dim)
 
     def forward(self, x):
-        x = F.relu(self.fc1(x))
+        x = F.sigmoid(self.fc1(x))
         x = self.fc2(x)
         return x
     
@@ -20,7 +20,7 @@ class SimpleNN2(nn.Module):
         self.fc3 = nn.Linear(hidden_dim, output_dim)
 
     def forward(self, x):
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
+        x = F.sigmoid(self.fc1(x))
+        x = F.sigmoid(self.fc2(x))
         x = self.fc3(x)
         return x

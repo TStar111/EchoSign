@@ -19,7 +19,7 @@ def create_and_train_nn_classification(csv_file, model_save_path, wandb_project_
 
     # Assuming your dataset has features in columns 1 to n-1 and the target variable in column n
     X = data.iloc[:, :-1].values
-    y = data.iloc[:, -1].values
+    y = data.iloc[:, -1].astype(int).values
 
     # Step 2: Split your data into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -45,7 +45,7 @@ def create_and_train_nn_classification(csv_file, model_save_path, wandb_project_
     optimizer = Adam(model.parameters(), lr=0.001)
 
     # Step 8: Train your neural network
-    num_epochs = 50
+    num_epochs = 100
     for epoch in range(num_epochs):
         for inputs, targets in train_loader:
             optimizer.zero_grad()
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     main(data_file, model_file, wandb_project_name)
 
 # Command
-# python train_NN_model.py ../../data/dataset_double/dataset_double.csv ../../models/double_50_2.pt echosign_double
+# python NN/train_NN_model.py ../data/dataset_double_word/ricky-somya.csv ../models/rs_word.pt echosign_double
 
 
 # TODO: Consider other achitectures beyond simple NN
