@@ -9,7 +9,7 @@ int degreesY = 0;
 int motorPin = 9;
 
 BLEService customService("19B10000-E8F2-537E-4F6C-D104768A1214"); // define a custom service UUID
-BLECharacteristic customCharacteristic("19B10001-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite, 500); // define a custom characteristic UUID
+BLECharacteristic customCharacteristic("19B10001-E8F2-537E-4F6C-D104768A1214", BLERead | BLENotify | BLEWrite, 500); // define a custom characteristic UUID
 
 void setup() {
   pinMode(motorPin, OUTPUT);
@@ -24,6 +24,8 @@ void setup() {
     Serial.println("Starting BLE failed!");
     while (1);
   }
+
+  
 
   BLE.setLocalName("RightHand");
   BLE.setAdvertisedService(customService);
@@ -45,13 +47,13 @@ void setup() {
 
 void loop() {
   BLEDevice central = BLE.central();
-
+  char incomingByte; 
   if (central) {
     Serial.print("Connected to central: ");
     Serial.println(central.address());
 
     while (central.connected()) {
-      char incomingByte = central.read();
+      char incomingByte = customCharacteristic.read();
       if (incomingByte == '1') { // Calibration signal from BT to Arduino 
       // Activate the haptic motor (pulse, vibrate, etc.)
         digitalWrite(motorPin, HIGH);
@@ -96,3 +98,17 @@ void loop() {
   }
   delay(10); // Delay a second between readings
 }
+
+// char readCharacteristicValue(BLECharacteristic characteristic) {
+//   // print the UUID and properties of the characteristic
+//   Serial.print("\tCharacteristic ");
+//   Serial.print(characteristic.uuid());
+//   if (characteristic.canRead()) { // returns true if there is a readable characteristic available
+//     //read the characteristic value
+//     char incomingByte; // TODO: do I need to init this? 
+//     characteristic.readValue(&temperature,2);
+//     Serial.print(", incoming byte from BT is");
+//     Serial.println(incomingByte);
+//     return incomingByte
+//   }
+// }
