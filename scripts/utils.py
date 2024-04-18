@@ -39,6 +39,7 @@ def initialize_bt(mac=None, uuid = None):
     peripherals = adapter.scan_get_results()
 
     # Query the user to pick a peripheral
+    print("About to query user to pick a peripheral")
     if mac is None:
         print("Please select a peripheral:")
         for i, peripheral in enumerate(peripherals):
