@@ -32,10 +32,10 @@ minFlex2 = [float('inf')] * 5
 maxFlex2 = [-float('inf')] * 5
 
 # Hyperparameters
-consecutive = 8
+consecutive = 4
 
 # ARDUINO Bluetooth information
-CHARACTERISTIC_UUID1 = "19B10001-E8F2-537E-4F6C-D104768A1214"
+CHARACTERISTIC_UUID1 = "19b10000-e8f2-537e-4f6c-d104768a1214"
 address1 = "02:81:b7:4b:04:26" # MAC addres of the remove ble device
 CHARACTERISTIC_UUID2 = "19b10000-e8f2-537e-4f6c-d104768a1214"
 address2= "84:f5:9a:b9:e4:13"
@@ -70,7 +70,7 @@ def readin_data(peripheral1, suuid1, cuuid1, peripheral2, suuid2, cuuid2, buffer
                 contents2[i] = (contents2[i] - minFlex2[i])/(maxFlex2[i] - minFlex2[i])
 
     # Handles the queueing
-    buffer = buffer[14:] + contents1 + contents2
+    buffer = buffer[28:] + contents1 + contents2
 
     return buffer
 
@@ -101,9 +101,9 @@ if __name__ == "__main__":
         # Calibrate data to map 
 
         print("Calibrating for 5 second, please move between max and min flexion")
-        time.sleep(5)
+        time.sleep(1)
         curTime = time.time()
-        while time.time() - curTime < 5: # 5 second period of calibration
+        while time.time() - curTime < 4: # 5 second period of calibration
             time.sleep(0.05)
             contents1 = bytes_to_floats(peripheral1.read(service_uuid1, characteristic_uuid1))
             contents2 = bytes_to_floats(peripheral2.read(service_uuid2, characteristic_uuid2))

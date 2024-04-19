@@ -24,9 +24,9 @@ bad_words = ["meet", "live", "big", "more", "but"]
 # Model parameters
 # Make sure to adjust this to reflect your choice of single/double, or model
 input_dim = 28
-hidden_dim = 64
+hidden_dim = 128
 output_dim = 11
-checkpoint_path = 'models/double_word/rs_word.pt'
+checkpoint_path = 'models/rs_comp.pt'
 checkpoint_path2 = "models/double_word/rs_five.pt"
 
 # Calibration storage
@@ -36,13 +36,13 @@ minFlex2 = [float('inf')] * 5
 maxFlex2 = [-float('inf')] * 5
 
 # Hyperparameters
-consecutive = 8
+consecutive = 4
 
-# ARDUINO Bluetooth information
-CHARACTERISTIC_UUID1 = "19B10001-E8F2-537E-4F6C-D104768A1214"
-address1 = "02:81:b7:4b:04:26" # MAC addres of the remove ble device
+# ARDUINO Bluetooth information (Adjust this for ARDUINO, left=1, right=2)
+CHARACTERISTIC_UUID1 = "19b10000-e8f2-537e-4f6c-d104768a1214"
+address1 = "75:4f:4e:83:72:84" # MAC addres of the remove ble device
 CHARACTERISTIC_UUID2 = "19b10000-e8f2-537e-4f6c-d104768a1214"
-address2= "84:f5:9a:b9:e4:13"
+address2= "6b:b9:05:ce:25:18"
 
 # Function that will return [bool, letter, new_tracker]
 def classification_heuristic(new_letter, tracker, consecutive):
@@ -66,12 +66,12 @@ def classification_heuristic(new_letter, tracker, consecutive):
 
 
 if __name__ == "__main__":
-    peripheral1, service_uuid1, characteristic_uuid1 = initialize_bt(mac=address2, uuid=CHARACTERISTIC_UUID2)
-    peripheral2, service_uuid2, characteristic_uuid2 = initialize_bt(mac=address1, uuid=CHARACTERISTIC_UUID1)
+    peripheral1, service_uuid1, characteristic_uuid1 = initialize_bt()#mac=address1, uuid=CHARACTERISTIC_UUID1)
+    peripheral2, service_uuid2, characteristic_uuid2 = initialize_bt()#mac=address2, uuid=CHARACTERISTIC_UUID2)
 
     # Initialize model with saved weights
     model = SimpleNN2(input_dim, hidden_dim, output_dim)
-    model2 = SimpleNN2(input_dim, hidden_dim, output_dim-6)
+    model2 = SimpleNN2(input_dim, 64, output_dim-6)
 
     # Load the model checkpoint
     checkpoint = torch.load(checkpoint_path, map_location=torch.device('cpu'))  # Change 'cpu' to 'cuda' if you're using GPU
@@ -95,9 +95,9 @@ if __name__ == "__main__":
         # Calibrate data to map 
 
         print("Calibrating for 5 second, please move between max and min flexion")
-        time.sleep(5)
+        time.sleep(1)
         curTime = time.time()
-        while time.time() - curTime < 5: # 5 second period of calibration
+        while time.time() - curTime < 4: # 5 second period of calibration
             time.sleep(0.05)
             contents1 = bytes_to_floats(peripheral1.read(service_uuid1, characteristic_uuid1))
             contents2 = bytes_to_floats(peripheral2.read(service_uuid2, characteristic_uuid2))
