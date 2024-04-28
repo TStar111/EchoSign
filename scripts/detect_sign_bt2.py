@@ -1,30 +1,36 @@
-#!/usr/bin/env python3
+# actually detect_bt2_mod2.py
 import torch
 import time
 from win32com.client import Dispatch
 
 from utils import bytes_to_floats, initialize_bt
-from NN.models_NN import SimpleNN
+from NN.models_NN import SimpleNN, SimpleNN2
 
 # Empty storage (aka Global variables)
 start_time = None
 end_time = None
 class_tracker = [None, None]
-# Create an empty dictionary
-number_to_alphabet = {}
 
-# Populate the dictionary
-for i in range(26):
-    number_to_alphabet[i] = chr(ord('a') + i)
-
-number_to_alphabet[26] = " "
+num_to_word1 = {0: "what",  1: "time",
+               2: "car",    3: "church",
+               4: "family", 5: "meet",
+               6: "live",   7: "big",
+               8: "more",   9: "but",
+               10: " "}
+num_to_word2 = {0: "meet",  1:"live",
+                2:"big",    3:"more",
+                4:"but"}
+num_to_word3 = {0: "time", 1: "church"}
+bad_words = ["meet", "live", "big", "more", "but"]
 
 # Model parameters
 # Make sure to adjust this to reflect your choice of single/double, or model
 input_dim = 28
-hidden_dim = 64
-output_dim = 27
-checkpoint_path = '../models/double_50_1.pt'
+hidden_dim = 128
+output_dim = 11
+checkpoint_path = 'models/rs_comp.pt'
+checkpoint_path2 = "models/double_word/rs_five.pt"
+checkpoint_path3 = "models/doble_word/rs_two.pt"
 
 # Calibration storage
 minFlex1 = [float('inf')] * 5
@@ -33,13 +39,13 @@ minFlex2 = [float('inf')] * 5
 maxFlex2 = [-float('inf')] * 5
 
 # Hyperparameters
-consecutive = 8
+consecutive = 4
 
-# ARDUINO Bluetooth information
-CHARACTERISTIC_UUID1 = "19B10001-E8F2-537E-4F6C-D104768A1214"
-address1 = "02:81:b7:4b:04:26" # MAC addres of the remove ble device
+# ARDUINO Bluetooth information (Adjust this for ARDUINO, left=1, right=2)
+CHARACTERISTIC_UUID1 = "19b10000-e8f2-537e-4f6c-d104768a1214"
+address1 = "75:4f:4e:83:72:84" # MAC addres of the remove ble device
 CHARACTERISTIC_UUID2 = "19b10000-e8f2-537e-4f6c-d104768a1214"
-address2= "84:f5:9a:b9:e4:13"
+address2= "6b:b9:05:ce:25:18"
 
 # Function that will return [bool, letter, new_tracker]
 def classification_heuristic(new_letter, tracker, consecutive):
@@ -63,20 +69,28 @@ def classification_heuristic(new_letter, tracker, consecutive):
 
 
 if __name__ == "__main__":
-    peripheral1, service_uuid1, characteristic_uuid1 = initialize_bt(mac=address2, uuid=CHARACTERISTIC_UUID2)
-    peripheral2, service_uuid2, characteristic_uuid2 = initialize_bt(mac=address1, uuid=CHARACTERISTIC_UUID1)
+    peripheral1, service_uuid1, characteristic_uuid1 = initialize_bt()#mac=address1, uuid=CHARACTERISTIC_UUID1)
+    peripheral2, service_uuid2, characteristic_uuid2 = initialize_bt()#mac=address2, uuid=CHARACTERISTIC_UUID2)
 
     # Initialize model with saved weights
-    model = SimpleNN(input_dim, hidden_dim, output_dim)
+    model = SimpleNN2(input_dim, hidden_dim, output_dim)
+    model2 = SimpleNN2(input_dim, 64, output_dim-6)
+    model3 = SimpleNN2(input_dim, 128, output_dim-9)
 
     # Load the model checkpoint
     checkpoint = torch.load(checkpoint_path, map_location=torch.device('cpu'))  # Change 'cpu' to 'cuda' if you're using GPU
+    checkpoint2 = torch.load(checkpoint_path2, map_location=torch.device('cpu'))  # Change 'cpu' to 'cuda' if you're using GPU
+    checkpoint3 = torch.load(checkpoint_path3, map_location=torch.device('cpu'))  # Change 'cpu' to 'cuda' if you're using GPU
 
     # Load the model state_dict
     model.load_state_dict(checkpoint)
+    model2.load_state_dict(checkpoint2)
+    model3.load_state_dict(checkpoint_path3)
 
     # Set the model to evaluation mode
     model.eval()
+    model2.eval()
+    model3.eval()
 
     # Initialize speaker (for Windows)
     speak = Dispatch("SAPI.SpVoice").Speak
@@ -84,18 +98,17 @@ if __name__ == "__main__":
     try:
 
         # Haptic signal here to signal beginning of calibration
-        # Example condition to trigger the motor
-        start_calibrating = True  # Replace with your actual condition
-        
-        if start_calibrating:
-            print("(BT to Arduino) Sending calibration start signal...")
-            peripheral1.write(service_uuid, characteristic_uuid, bytearray([1]))  # Send signal to glove 1 Arduino to trigger motors
-            time.sleep(1)  # Delay to ensure the motor is activated
+        start_calibrating = True
         # Calibrate data to map 
+        if start_calibrating:
+            print("(BT to Arduino) Sending calibration start haptic signal..."
+            peripheral2.write_command(service_uuid2, characteristic_uuid2, b'6')  # Send signal to glove 1 Arduino to trigger motors
 
         print("Calibrating for 5 second, please move between max and min flexion")
+        
+        time.sleep(1)
         curTime = time.time()
-        while time.time() - curTime < 5: # 10 second period of calibration
+        while time.time() - curTime < 4: # 5 second period of calibration
             time.sleep(0.05)
             contents1 = bytes_to_floats(peripheral1.read(service_uuid1, characteristic_uuid1))
             contents2 = bytes_to_floats(peripheral2.read(service_uuid2, characteristic_uuid2))
@@ -113,12 +126,11 @@ if __name__ == "__main__":
 
 
         # Haptic signal here to signal end of calibration
-        # Example condition to trigger the motor
-        end_calibrating = True  # Replace with your actual condition
-
+        end_calibrating = True
         if end_calibrating:
-            print("(BT to Arduino) Sending calibration end signal...")
-            peripheral1.write(service_uuid, characteristic_uuid, bytearray([1]))  # Send signal to Arduino to trigger motor
+            print("(BT to Arduino) Sending calibration end haptic signal...")
+
+            peripheral2.write_command(service_uuid2, characteristic_uuid2, b'7')  # Send signal to Arduino to trigger motor
             time.sleep(1)  # Delay to ensure the motor is activated
 
         # Keep reading data
@@ -139,22 +151,30 @@ if __name__ == "__main__":
             data_array = torch.tensor(content)
             probs = model(data_array)
             index = torch.argmax(probs, dim=0).item()
-            yhat = number_to_alphabet[index]
-                        
+            yhat = num_to_word1[index]
+
+            if yhat in bad_words:
+                probs = model2(data_array)
+                index = torch.argmax(probs, dim=0).item()
+                yhat = num_to_word2[index]
+
+            if yhat in ["time", "church"]:
+                probs = model3(data_array)
+                index = torch.argmax(probs, dim=0).item()
+                yhat = num_to_word3[index]
+
             if yhat is not None:
                 print(yhat)
                 passed, letter, class_tracker = classification_heuristic(yhat, class_tracker, consecutive)
                 if passed:
                     print(letter)
                     print("Elapsed time:", end_time - start_time)
-                    speak(letter) # something has been successfully said 
-                    sign_detected = True 
-                    if sign_detected: 
-                        print("(BT to Arduino) Sending sign detected signal...") # TODO: confirm peripheral1 is right hand 
-                        peripheral1.write(service_uuid, characteristic_uuid, bytearray([2])) # Send signal to Arduino to trigger motor
-                        time.sleep(1) # Delay to ensure the motor is activated
-
-
+                    speak(letter)
+                    sign_detected = true
+                    if sign_detected:
+                        print("(BT to Arduino) Sending sign detected haptic signal..."
+                        peripheral2.write_command(service_uuid2, characteristic_uuid2, b'8')  # Send signal to glove 1 Arduino to trigger motors
+                        
 
 
     except KeyboardInterrupt:
@@ -168,4 +188,4 @@ if __name__ == "__main__":
         
 # Make sure to select the proper ML model before starting
         
-# With consecutive=8, it takes around 0.82
+# With consecutive=8, it takes around 0.82v

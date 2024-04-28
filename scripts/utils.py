@@ -1,5 +1,6 @@
 import struct
 import simplepyble
+import time
 
 # Define a function to decode a byte array to multiple floats
 def bytes_to_floats(byte_data):
@@ -14,6 +15,9 @@ def bytes_to_floats(byte_data):
     return floats_list
 
 def initialize_bt(mac=None, uuid = None):
+    # def initialize_bt(): 
+    mac = None
+    print("mac at the start of initialize_bt is:", mac)
     adapters = simplepyble.Adapter.get_adapters()
 
     if len(adapters) == 0:
@@ -39,7 +43,8 @@ def initialize_bt(mac=None, uuid = None):
     peripherals = adapter.scan_get_results()
 
     # Query the user to pick a peripheral
-    print("About to query user to pick a peripheral")
+    print("(utils.py) About to query user to pick a peripheral")
+    print("mac is now:", mac)
     if mac is None:
         print("Please select a peripheral:")
         for i, peripheral in enumerate(peripherals):
@@ -48,6 +53,7 @@ def initialize_bt(mac=None, uuid = None):
         choice = int(input("Enter choice: "))
         peripheral = peripherals[choice]
     else:
+        print("(utils.py) mac is not None")
         for i, peripheral in enumerate(peripherals):
             if peripheral.address() == mac:
                 choice = i
@@ -55,6 +61,7 @@ def initialize_bt(mac=None, uuid = None):
                 break
 
     print(f"Connecting to: {peripheral.identifier()} [{peripheral.address()}]")
+
     peripheral.connect()
 
     print("Successfully connected, listing services...")
