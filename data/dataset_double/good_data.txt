@@ -1,0 +1,55 @@
+ricky-a, good
+ricky-b, good
+ricky-c, good
+ricky-d, good
+ricky-e, bad
+ricky-f, good
+ricky-g, okay (thumb)
+ricky-h, good
+ricky-i, good
+ricky-j, okay (thumb)
+ricky-k, good
+ricky-l, good
+ricky-m, bad
+ricky-n, good
+ricky-o, good   
+ricky-p, okay (middle, ring)
+ricky-q, okay
+ricky-r, good
+ricky-s, good
+ricky-t, good
+ricky-u, good
+ricky-v, good
+ricky-w, good
+ricky-x, bad
+ricky-y, good
+ricky-z, good
+
+somya-a good
+somya-b okay
+somya-c good
+somya-d good
+somya-e bad
+somya-f okay (thumb)
+somya-g good
+somya-h good
+somya-i bad
+somya-j good
+somya-k good
+somya-l bad
+somya-m okay
+somya-n good
+somya-o bad
+somya-p good
+somya-q good
+somya-r okay (index)
+somya-s good
+somya-t okay (pinky)
+somya-u good
+somya-v good
+somya-w okay (pinky)
+somya-x good
+somya-y okay (pinky)
+somya-z okay
+
+Look at p please
