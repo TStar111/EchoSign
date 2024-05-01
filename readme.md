@@ -8,10 +8,10 @@ Ricky Gao, Ria Balli, Somya Pathak
 
 HARDWARE
 --------
-Spectra Flex Sensor
-Arduino Nano BLE 33
-PCB
-Miscellaneous
+Spectra Flex Sensor  
+Arduino Nano BLE 33  
+PCB  
+Miscellaneous  
 
 SOFTWARE
 --------
