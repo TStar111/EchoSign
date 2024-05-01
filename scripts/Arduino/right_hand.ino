@@ -50,11 +50,12 @@ void loop() {
 
     while (central.connected()) {
 
-      double voltageThumb = analogRead(A3); // Read the analog input on pin A0
-      double voltagePoint = analogRead(A4); // Read the analog input on pin A0
-      double voltageMiddle = analogRead(A5); // Read the analog input on pin A0
-      double voltageRing = analogRead(A6); // Read the analog input on pin A0
-      double voltagePinky = analogRead(A7); // Read the analog input on pin A0
+      // Note that the pinout is reversed from the left hand
+      double voltageThumb = analogRead(A6); // Read the analog input on pin A6
+      double voltagePoint = analogRead(A0); // Read the analog input on pin A0
+      double voltageMiddle = analogRead(A2); // Read the analog input on pin A2
+      double voltageRing = analogRead(A1); // Read the analog input on pin A1
+      double voltagePinky = analogRead(A3); // Read the analog input on pin A3
 
       if (IMU.accelerationAvailable()) {
         IMU.readAcceleration(x, y, z);

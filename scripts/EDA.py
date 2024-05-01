@@ -16,7 +16,7 @@ def plot_histograms(dataset1, dataset2):
         axs[i, 0].set_ylabel('Frequency')
 
         axs[i, 0].hist(dataset1[:, i+14], bins=20)  # Adjust the number of bins as needed
-        axs[i, 0].set_title(f"Feature {i+14}")
+        # axs[i, 0].set_title(f"Feature {i+14}")
         axs[i, 0].set_xlabel('Value')
         axs[i, 0].set_ylabel('Frequency')
 
@@ -28,9 +28,21 @@ def plot_histograms(dataset1, dataset2):
         axs[i, 1].set_ylabel('Frequency')
 
         axs[i, 1].hist(dataset2[:, i+14], bins=20)  # Adjust the number of bins as needed
-        axs[i, 1].set_title(f"Feature {i+14}")
+        # axs[i, 1].set_title(f"Feature {i+14}")
         axs[i, 1].set_xlabel('Value')
         axs[i, 1].set_ylabel('Frequency')
+
+    # # Iterate through each feature and plot its histogram
+    # for i in range(num_features):
+    #     axs[i, 2].hist(dataset3[:, i], bins=20)  # Adjust the number of bins as needed
+    #     axs[i, 2].set_title(f"Feature {i}")
+    #     axs[i, 2].set_xlabel('Value')
+    #     axs[i, 2].set_ylabel('Frequency')
+
+    #     axs[i, 2].hist(dataset3[:, i+14], bins=20)  # Adjust the number of bins as needed
+    #     axs[i, 2].set_title(f"Feature {i+14}")
+    #     axs[i, 2].set_xlabel('Value')
+    #     axs[i, 2].set_ylabel('Frequency')
 
     plt.tight_layout()
     
@@ -43,13 +55,17 @@ def plot_histograms(dataset1, dataset2):
 if __name__ == "__main__":
     # Load your dataset
     # Replace 'your_dataset.csv' with the actual path to your dataset
-    df1 = pd.read_csv('../data/dataset_double_word/ricky-more.csv')
+    df1 = pd.read_csv('data/data_pcb/ricky-none2.csv')
     feature_names1 = df1.columns.values
     dataset1 = df1.values
 
-    df2 = pd.read_csv('../data/dataset_double_word/ricky-what.csv')
+    df2 = pd.read_csv('data/data_pcb/ria-none.csv')
     feature_names2 = df2.columns.values
     dataset2 = df2.values
+
+    # df3 = pd.read_csv('data/dataset_double_word/somya-but.csv')
+    # feature_names3 = df3.columns.values
+    # dataset3 = df3.values
     
     # dataset = np.random.randn(1000, 6)  # Generating random data, replace with your dataset
     # dataset[:, 4] += 1

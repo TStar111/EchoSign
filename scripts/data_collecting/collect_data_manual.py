@@ -6,7 +6,7 @@ import asyncio
 import sys
 from bleak import *
 
-from ..utils import bytes_to_floats
+from ..inference.utils import bytes_to_floats
 
 # File for data to be written to
 filepath = "../../data/data.csv"

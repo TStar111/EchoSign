@@ -2,6 +2,10 @@ import torch
 import time
 from win32com.client import Dispatch
 
+import sys
+import os
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(parent_dir)
 from utils import bytes_to_floats, initialize_bt
 from NN.models_NN import SimpleNN, SimpleNN2
 
@@ -10,20 +14,26 @@ start_time = None
 end_time = None
 class_tracker = [None, None]
 
-# number_to_alphabet[26] = " "
-num_to_word = {0: "what",   1: "time",
+num_to_word1 = {0: "what",  1: "time",
                2: "car",    3: "church",
                4: "family", 5: "meet",
                6: "live",   7: "big",
                8: "more",   9: "but",
                10: " "}
+num_to_word2 = {0:"meet",  1:"live",
+                2:"big",    3:"more",
+                4:"but"}
+num_to_word3 = {0: "time", 1: "church"}
+bad_words = ["meet", "live", "big", "more", "but"]
 
 # Model parameters
 # Make sure to adjust this to reflect your choice of single/double, or model
-input_dim = 28 * 5
-hidden_dim = 64
+input_dim = 28
+hidden_dim = 128
 output_dim = 11
-checkpoint_path = 'models/double_word/rs_word_time.pt'
+checkpoint_path = 'models/double_pcb/rr_compv3.pt'
+checkpoint_path2 = "models/double_pcb/rr_five.pt"
+checkpoint_path3 = "models/double_pcb/rr_two.pt"
 
 # Calibration storage
 minFlex1 = [float('inf')] * 5
@@ -34,11 +44,11 @@ maxFlex2 = [-float('inf')] * 5
 # Hyperparameters
 consecutive = 4
 
-# ARDUINO Bluetooth information
+# ARDUINO Bluetooth information (Adjust this for ARDUINO, left=1, right=2)
 CHARACTERISTIC_UUID1 = "19b10000-e8f2-537e-4f6c-d104768a1214"
 address1 = "02:81:b7:4b:04:26" # MAC addres of the remove ble device
 CHARACTERISTIC_UUID2 = "19b10000-e8f2-537e-4f6c-d104768a1214"
-address2= "84:f5:9a:b9:e4:13"
+address2= "75:4f:4e:83:72:84"
 
 # Function that will return [bool, letter, new_tracker]
 def classification_heuristic(new_letter, tracker, consecutive):
@@ -60,36 +70,30 @@ def classification_heuristic(new_letter, tracker, consecutive):
         start_time = time.time()
         return False, None, tracker
 
-# Function that will handle reading data and adding to queue
-def readin_data(peripheral1, suuid1, cuuid1, peripheral2, suuid2, cuuid2, buffer, minFlex1, maxFlex1, minFlex2, maxFlex2):
-    contents1 = bytes_to_floats(peripheral1.read(suuid1, cuuid1))
-    contents2 = bytes_to_floats(peripheral2.read(suuid2, cuuid2))
-
-    for i in range(5):
-                contents1[i] = (contents1[i] - minFlex1[i])/(maxFlex1[i] - minFlex1[i])
-                contents2[i] = (contents2[i] - minFlex2[i])/(maxFlex2[i] - minFlex2[i])
-
-    # Handles the queueing
-    buffer = buffer[28:] + contents1 + contents2
-
-    return buffer
-
 
 if __name__ == "__main__":
-    peripheral1, service_uuid1, characteristic_uuid1 = initialize_bt(mac=address2, uuid=CHARACTERISTIC_UUID2)
-    peripheral2, service_uuid2, characteristic_uuid2 = initialize_bt(mac=address1, uuid=CHARACTERISTIC_UUID1)
+    peripheral1, service_uuid1, characteristic_uuid1 = initialize_bt(mac=address1, uuid=CHARACTERISTIC_UUID1)
+    peripheral2, service_uuid2, characteristic_uuid2 = initialize_bt(mac=address2, uuid=CHARACTERISTIC_UUID2)
 
     # Initialize model with saved weights
     model = SimpleNN2(input_dim, hidden_dim, output_dim)
+    model2 = SimpleNN2(input_dim, hidden_dim, output_dim-6)
+    model3 = SimpleNN2(input_dim, hidden_dim, output_dim-9)
 
     # Load the model checkpoint
     checkpoint = torch.load(checkpoint_path, map_location=torch.device('cpu'))  # Change 'cpu' to 'cuda' if you're using GPU
+    checkpoint2 = torch.load(checkpoint_path2, map_location=torch.device('cpu'))  # Change 'cpu' to 'cuda' if you're using GPU
+    checkpoint3 = torch.load(checkpoint_path3, map_location=torch.device('cpu'))  # Change 'cpu' to 'cuda' if you're using GPU
 
     # Load the model state_dict
     model.load_state_dict(checkpoint)
+    model2.load_state_dict(checkpoint2)
+    model3.load_state_dict(checkpoint3)
 
     # Set the model to evaluation mode
     model.eval()
+    model2.eval()
+    model3.eval()
 
     # Initialize speaker (for Windows)
     speak = Dispatch("SAPI.SpVoice").Speak
@@ -122,31 +126,37 @@ if __name__ == "__main__":
 
         # Haptic signal here to signal end of calibration
 
-        # Some calibration time to fill the buffer
-        buffer = [None] * input_dim
-
-        print("Additional 5 sec to fill buffer")
-        curTime = time.time()
-        while time.time() - curTime < 5: # 5 second period of calibration
-            time.sleep(0.05)
-            buffer = readin_data(peripheral1, service_uuid1, characteristic_uuid1,
-                                 peripheral2, service_uuid2, characteristic_uuid2,
-                                 buffer,
-                                 minFlex1, maxFlex1, minFlex2, maxFlex2)
-
         # Keep reading data
         while True:
             time.sleep(0.05)
-            buffer = readin_data(peripheral1, service_uuid1, characteristic_uuid1,
-                                 peripheral2, service_uuid2, characteristic_uuid2,
-                                 buffer,
-                                 minFlex1, maxFlex1, minFlex2, maxFlex2)
+            contents1 = bytes_to_floats(peripheral1.read(service_uuid1, characteristic_uuid1))
+            contents2 = bytes_to_floats(peripheral2.read(service_uuid2, characteristic_uuid2))
+            # print("Left Hand:")
+            # print(contents1)
+            # print("Right Hand:")
+            # print(contents2)
 
-            data_array = torch.tensor(buffer)
+            for i in range(5):
+                contents1[i] = (contents1[i] - minFlex1[i])/(maxFlex1[i] - minFlex1[i])
+                contents2[i] = (contents2[i] - minFlex2[i])/(maxFlex2[i] - minFlex2[i])
+
+            content = contents1 + contents2
+            data_array = torch.tensor(content)
             probs = model(data_array)
+            print(probs)
             index = torch.argmax(probs, dim=0).item()
-            yhat = num_to_word[index]
-                        
+            yhat = num_to_word1[index]
+
+            if yhat in bad_words:
+                probs = model2(data_array)
+                index = torch.argmax(probs, dim=0).item()
+                yhat = num_to_word2[index]
+
+            if yhat in ["time", "church"]:
+                probs = model3(data_array)
+                index = torch.argmax(probs, dim=0).item()
+                yhat = num_to_word3[index]
+
             if yhat is not None:
                 print(yhat)
                 passed, letter, class_tracker = classification_heuristic(yhat, class_tracker, consecutive)

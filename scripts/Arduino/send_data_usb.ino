@@ -25,12 +25,12 @@ void loop() {
     // Read magnetometer data
     float magX, magY, magZ;
     IMU.readMagneticField(magX, magY, magZ);
-    // Read analog pins
-    float thumb = analogRead(A5);
-    float pointer = analogRead(A3);
-    float middle = analogRead(A7);
-    float ring = analogRead(A4);
-    float pinky = analogRead(A6);
+    // Read analog pins (PCB: 6,0,2,1,3)
+    double thumb = analogRead(A6); // Read the analog input on pin A0
+    double pointer = analogRead(A0); // Read the analog input on pin A0
+    double middle = analogRead(A2); // Read the analog input on pin A0
+    double ring = analogRead(A1); // Read the analog input on pin A0
+    double pinky = analogRead(A3); // Read the analog input on pin A0
     
     // Format should be Thumb, Index, Middle, Ring, Pinky, 
     // Format the data into a single string for CSV

@@ -36,7 +36,7 @@ def create_and_train_nn_classification(csv_file, model_save_path, wandb_project_
 
     # Step 6: Instantiate your neural network
     input_dim = X_train.shape[1]
-    hidden_dim = 64
+    hidden_dim = 128
     output_dim = len(pd.unique(y))  # Number of unique classes in your target variable
     model = SimpleNN2(input_dim, hidden_dim, output_dim)
 
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     main(data_file, model_file, wandb_project_name)
 
 # Command
-# python NN/train_NN_model.py ../data/dataset_double_word/ricky-somya.csv ../models/rs_word.pt echosign_double
+# python scripts/NN/train_NN_model.py data/data_pcb/rr_compv3.csv models/rr_compv3.pt echosign_double
 
 
 # TODO: Consider other achitectures beyond simple NN

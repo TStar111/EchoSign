@@ -1,6 +1,11 @@
 import simplepyble
 
-from utils import bytes_to_floats
+
+import sys
+import os
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(parent_dir)
+from scripts.inference.utils import bytes_to_floats
 
 if __name__ == "__main__":
     adapters = simplepyble.Adapter.get_adapters()

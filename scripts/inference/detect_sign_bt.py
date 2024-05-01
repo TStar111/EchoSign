@@ -2,6 +2,10 @@ import torch
 import time
 from win32com.client import Dispatch
 
+import sys
+import os
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(parent_dir)
 from utils import bytes_to_floats, initialize_bt
 from NN.models_NN import SimpleNN
 

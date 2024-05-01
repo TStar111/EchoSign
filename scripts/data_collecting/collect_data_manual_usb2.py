@@ -7,14 +7,12 @@ from utils import bytes_to_floats, initialize_bt
 # Note for both implementations, the left should always be 1, and the right should always be 2
 
 # File for data to be written to
-filepath = "../../data/somya-none.csv"
-
-# Alphabel dictionary
-my_dict = {chr(i): i - 97 for i in range(97, 123)}
+# Change this to suit your needs
+filepath = "data/data_pcb/ricky-none2.csv"
 
 # Current label (manual)
-label = my_dict["z"]
-label = 26
+# Change this to suit your needs
+label = 10
 
 # Calibration storage
 minFlex1 = [float('inf')] * 5
@@ -22,8 +20,9 @@ maxFlex1 = [-float('inf')] * 5
 minFlex2 = [float('inf')] * 5
 maxFlex2 = [-float('inf')] * 5
 
-ser1 = serial.Serial('COM11', 9600, timeout=1)  # Adjust port and baud rate as needed
-ser2 = serial.Serial('COM9', 9600, timeout=1)  # Adjust port and baud rate as needed
+# Change this to suit your needs
+ser1 = serial.Serial('COM9', 9600, timeout=1)  # Adjust port and baud rate as needed
+ser2 = serial.Serial('COM13', 9600, timeout=1)  # Adjust port and baud rate as needed
 
 def handle_usb_data(ser1, ser2):
     if ser1.in_waiting > 0 and ser2.in_waiting > 0:  # Check if there's data available to read
@@ -73,15 +72,13 @@ if __name__ == "__main__":
         print(maxFlex2)
         input("Press enter to start collecting data")
 
-        while True:
+        curTime = time.time()
+        # Change the number to collect different number of data (110 ~= 1100 datapoints)
+        while time.time() - curTime < 220:
             time.sleep(0.05)
             contents = handle_usb_data(ser1, ser2)
             
             if contents is not None:
-                # print("Left")
-                # print(contents[0:5])
-                # print("Right")
-                # print(contents[14:19])
                 for i in range(5):
                     contents[i] = (contents[i] - minFlex1[i])/(maxFlex1[i] - minFlex1[i])
                     contents[i+14] = (contents[i+14] - minFlex2[i])/(maxFlex2[i] - minFlex2[i])
@@ -96,7 +93,7 @@ if __name__ == "__main__":
         exit()
 
 # Run command below in scripts folder
-# python collect_data_manual_bt2.py
+# python collect_data_manual_usb2.py
         
 # Make sure to adjust label and output file before running
 
