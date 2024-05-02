@@ -43,7 +43,7 @@ minFlex2 = [float('inf')] * 5
 maxFlex2 = [-float('inf')] * 5
 
 # Hyperparameters
-consecutive = 4
+consecutive = 3
 
 # ARDUINO Bluetooth information (Adjust this for ARDUINO, left=1, right=2)
 CHARACTERISTIC_UUID1 = "19b10000-e8f2-537e-4f6c-d104768a1214"
@@ -168,9 +168,10 @@ if __name__ == "__main__":
                 if passed:
                     print(letter)
                     print("Elapsed time:", end_time - start_time)
-                    speak(letter)
-                    peripheral1.write_request(service_uuid2, characteristic_uuid2, b'8')  # Send signal to glove 1 Arduino to trigger motors
-                    peripheral1.write_request(service_uuid2, characteristic_uuid2, b'10')  # Send signal to glove 1 Arduino to trigger motors
+                    if letter != " ":
+                        peripheral1.write_request(service_uuid2, characteristic_uuid2, b'8')  # Send signal to glove 1 Arduino to trigger motors
+                        peripheral1.write_request(service_uuid2, characteristic_uuid2, b'10')  # Send signal to glove 1 Arduino to trigger motors
+                        speak(letter)
     except KeyboardInterrupt:
         print("KeyboardInterrupt: Stopping inference...")
         peripheral1.disconnect()
