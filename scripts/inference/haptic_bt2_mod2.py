@@ -1,3 +1,4 @@
+# actually detect_bt2_mod2.py
 import torch
 import time
 from win32com.client import Dispatch
@@ -20,7 +21,7 @@ num_to_word1 = {0: "what",  1: "time",
                6: "live",   7: "big",
                8: "more",   9: "but",
                10: " "}
-num_to_word2 = {0:"meet",  1:"live",
+num_to_word2 = {0: "meet",  1:"live",
                 2:"big",    3:"more",
                 4:"but"}
 num_to_word3 = {0: "time", 1: "church"}
@@ -101,13 +102,15 @@ if __name__ == "__main__":
     try:
 
         # Haptic signal here to signal beginning of calibration
-        
-        # Calibrate data to map 
+        print("(BT to Arduino) Sending calibration start haptic signal...")
+        peripheral1.write_request(service_uuid2, characteristic_uuid2, b'6')  # Send signal to glove 1 Arduino to trigger motors
+        peripheral1.write_request(service_uuid2, characteristic_uuid2, b'10')  # Send signal to glove 1 Arduino to trigger motors
 
         print("Calibrating for 5 second, please move between max and min flexion")
+        
         time.sleep(1)
         curTime = time.time()
-        while time.time() - curTime < 4: # 5 second period of calibration
+        while time.time() - curTime < 5: # 5 second period of calibration
             time.sleep(0.05)
             contents1 = bytes_to_floats(peripheral1.read(service_uuid1, characteristic_uuid1))
             contents2 = bytes_to_floats(peripheral2.read(service_uuid2, characteristic_uuid2))
@@ -116,15 +119,18 @@ if __name__ == "__main__":
                 minFlex2[i] = min(minFlex2[i], contents2[i])
                 maxFlex1[i] = max(maxFlex1[i], contents1[i])
                 maxFlex2[i] = max(maxFlex2[i], contents2[i])
-
+        print("Left hand:")
         print(minFlex1)
         print(maxFlex1)
+        print("Right hand:")
         print(minFlex2)
         print(maxFlex2)
+
+        print("(BT to Arduino) Sending calibration end haptic signal...")
+        peripheral1.write_request(service_uuid2, characteristic_uuid2, b'7')  # Send signal to Arduino to trigger motor
+        peripheral1.write_request(service_uuid2, characteristic_uuid2, b'10')  # Send signal to glove 1 Arduino to trigger motors
+        print()
         input("Press enter to start inference")
-
-
-        # Haptic signal here to signal end of calibration
 
         # Keep reading data
         while True:
@@ -143,7 +149,6 @@ if __name__ == "__main__":
             content = contents1 + contents2
             data_array = torch.tensor(content)
             probs = model(data_array)
-            print(probs)
             index = torch.argmax(probs, dim=0).item()
             yhat = num_to_word1[index]
 
@@ -164,12 +169,13 @@ if __name__ == "__main__":
                     print(letter)
                     print("Elapsed time:", end_time - start_time)
                     speak(letter)
-
-
+                    peripheral1.write_request(service_uuid2, characteristic_uuid2, b'8')  # Send signal to glove 1 Arduino to trigger motors
+                    peripheral1.write_request(service_uuid2, characteristic_uuid2, b'10')  # Send signal to glove 1 Arduino to trigger motors
     except KeyboardInterrupt:
         print("KeyboardInterrupt: Stopping inference...")
         peripheral1.disconnect()
         peripheral2.disconnect()
         exit()
 
-# python scripts/inference/detect_bt2_mod2.py
+# Run command below in 18500 folder
+# python scripts/inference/haptic_bt2_mod2.py
